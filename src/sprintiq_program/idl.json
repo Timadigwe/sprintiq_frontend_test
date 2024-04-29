@@ -1,0 +1,59 @@
+{
+  "version": "0.1.0",
+  "name": "sprintiq_escrow_program",
+  "instructions": [
+    {
+      "name": "initAndSendFunds",
+      "accounts": [
+        { "name": "tokenAccountOwnerPda", "isMut": true, "isSigner": false },
+        { "name": "vaultTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "senderTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "mintOfTokenBeingSent", "isMut": false, "isSigner": false },
+        { "name": "signer", "isMut": true, "isSigner": true },
+        { "name": "systemProgram", "isMut": false, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false },
+        { "name": "rent", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "amount", "type": "u64" }]
+    },
+    {
+      "name": "withdrawFundsToSender",
+      "accounts": [
+        { "name": "tokenAccountOwnerPda", "isMut": true, "isSigner": false },
+        { "name": "vaultTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "senderTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "mintOfTokenBeingSent", "isMut": false, "isSigner": false },
+        { "name": "signer", "isMut": true, "isSigner": true },
+        { "name": "systemProgram", "isMut": false, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false },
+        { "name": "rent", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "amount", "type": "u64" }]
+    },
+    {
+      "name": "sendFundsToPlayers",
+      "accounts": [
+        { "name": "tokenAccountOwnerPda", "isMut": true, "isSigner": false },
+        { "name": "vaultTokenAccount", "isMut": true, "isSigner": false },
+        { "name": "mintOfTokenBeingSent", "isMut": false, "isSigner": false },
+        { "name": "signer", "isMut": true, "isSigner": true },
+        { "name": "systemProgram", "isMut": false, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false },
+        { "name": "rent", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "percentages", "type": "bytes" }]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidPercentage",
+      "msg": "The percentage doesnt add up to 100%"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidParameters",
+      "msg": "The TokenAddresses and percentages length do not add up"
+    }
+  ]
+}

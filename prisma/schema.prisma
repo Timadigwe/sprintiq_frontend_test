@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  wallet_address String           @unique
+  username       String
+  nonce          Int              @default(0) // Nonce for the user 
+  avatar_url     String?
+  created_at     DateTime         @default(now())
+  Game           Game[]
+  ProfileHistory ProfileHistory[]
+  Notification   Notification[]
+}
+
+// TODO add a model to store subscriptions
+
+enum Type {
+  text
+  image
+  video
+}
+
+enum Status {
+  drafted
+  created
+  completed
+  ongoing
+  cancelled
+}
+
+enum HistoryType {
+  joined
+  answered
+  completed
+}
+
+model Game {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  description    String
+  creator_id     String
+  creator        Profile          @relation(fields: [creator_id], references: [wallet_address])
+  game_code      String?
+  status         Status           @default(created)
+  reward         Int?
+  created_at     DateTime         @default(now())
+  percentages    Percentages[]
+  questions      Question[]
+  ProfileHistory ProfileHistory[]
+}
+
+// The percentage of reward for each position i.e first 30% second 15%, e.t.c
+model Percentages {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  game_id    String   @db.ObjectId
+  game       Game     @relation(fields: [game_id], references: [id])
+  position   Int
+  percentage Int
+  created_at DateTime @default(now())
+}
+
+model Question {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  type           Type             @default(text)
+  question       String
+  description    String?
+  game_id        String           @db.ObjectId
+  game           Game             @relation(fields: [game_id], references: [id])
+  answer         String
+  points         Int
+  duration       Int
+  created_at     DateTime         @default(now())
+  options        Options[]
+  ProfileHistory ProfileHistory[]
+}
+
+model Options {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  question_id    String           @db.ObjectId
+  question       Question         @relation(fields: [question_id], references: [id])
+  value          String
+  created_at     DateTime         @default(now())
+  ProfileHistory ProfileHistory[]
+}
+
+model ProfileHistory {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  user_id     String
+  user        Profile     @relation(fields: [user_id], references: [wallet_address])
+  game_id     String      @db.ObjectId
+  game        Game        @relation(fields: [game_id], references: [id])
+  question_id String?     @db.ObjectId
+  question    Question?   @relation(fields: [question_id], references: [id])
+  // We might need to show users their anwsers in future so let's keep it
+  option_id   String?     @db.ObjectId
+  option      Options?    @relation(fields: [option_id], references: [id])
+  status      HistoryType @default(answered)
+  points      Int         @default(0)
+  created_at  DateTime    @default(now())
+}
+
+model Notification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String
+  user       Profile  @relation(fields: [user_id], references: [wallet_address])
+  ref_id     String
+  message    String
+  created_at DateTime @default(now())
+}
